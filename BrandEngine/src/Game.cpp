@@ -101,8 +101,13 @@ void Game::ProcessInput()
 void Game::Update()
 {
   // Simple way to cap runtime to force a given FPS
-  while(!SDL_TICKS_PASSED(SDL_GetTicks(), previousMillesecFrameTime + MILLESECPERFAME));
-  previousMillesecFrameTime = SDL_GetTicks();
+  int timeToWait = MILLISECOND_PER_FRAME - (SDL_GetTicks() - previousMillisec);
+  if (timeToWait > 0 && timeToWait < MILLISECOND_PER_FRAME)
+  {
+    SDL_Delay(timeToWait);
+  }
+  previousMillisec = SDL_GetTicks();
+
   playerPosition.x += playerVelocity.x;
   playerPosition.y += playerVelocity.y;
 }
