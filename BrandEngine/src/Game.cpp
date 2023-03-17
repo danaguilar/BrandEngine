@@ -1,5 +1,7 @@
 #include "Game.h"
 #include <SDL.h>
+#include <SDL_image.h>
+#include <glm/glm.hpp>
 #include <iostream>
 
 Game::Game()
@@ -50,6 +52,15 @@ void Game::Initialize()
   isRunning = true;
 }
 
+glm::vec2 playerPosition;
+glm::vec2 playerVelocity;
+
+void Game::Setup()
+{
+  playerPosition = { 10.0, 20.0 };
+  playerVelocity = { 1.0, 0.0 };
+}
+
 void Game::Destroy()
 {
   SDL_DestroyRenderer(renderer);
@@ -59,6 +70,7 @@ void Game::Destroy()
 
 void Game::Run()
 {
+  Setup();
   while (isRunning)
   {
     ProcessInput();
@@ -88,12 +100,30 @@ void Game::ProcessInput()
 
 void Game::Update()
 {
+  // Simple way to cap runtime to force a given FPS
+  while(!SDL_TICKS_PASSED(SDL_GetTicks(), previousMillesecFrameTime + MILLESECPERFAME));
+  previousMillesecFrameTime = SDL_GetTicks();
+  playerPosition.x += playerVelocity.x;
+  playerPosition.y += playerVelocity.y;
 }
 
 void Game::Render()
 {
-  SDL_SetRenderDrawColor(renderer, 0, 255, 0, SDL_ALPHA_OPAQUE);
+  SDL_SetRenderDrawColor(renderer, 21, 21, 21, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
+
+  SDL_Surface* surface = IMG_Load("./assets/images/tank-tiger-right.png");
+  SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+  SDL_FreeSurface(surface);
+
+  SDL_Rect destRect = {
+    static_cast<int>(playerPosition.x),
+    static_cast<int>(playerPosition.y),
+    32,
+    32
+  };
+  SDL_RenderCopy(renderer, texture, NULL, &destRect);
+  SDL_DestroyTexture(texture);
 
   SDL_RenderPresent(renderer);
 }
