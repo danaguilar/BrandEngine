@@ -1,4 +1,6 @@
 #include "Game.h"
+#include "../Logger/Logger.h"
+#include "../ECS/ECS.h"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <glm/glm.hpp>
@@ -7,19 +9,19 @@
 Game::Game()
 {
   isRunning = false;
-  std::cout << "Game constructor called" << std::endl;
+  Logger::Log("Game constructor called");
 }
 
 Game::~Game()
 {
-  std::cout << "Game destructor called" << std::endl;
+  Logger::Log("Game destructor called");
 }
 
 void Game::Initialize()
 {
   if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
   {
-    std::cerr << "SDL failed to initialize" << std::endl;
+    Logger::Err("SDL failed to initialize");
   }
   
   int displayWidth = 800;
@@ -33,7 +35,8 @@ void Game::Initialize()
   );
   if(!window)
   {
-    std::cerr << "Window failed to create" << std::endl;
+    Logger::Err("Window failed to create");
+    return;
   }
 
   renderer = SDL_CreateRenderer(
@@ -44,21 +47,22 @@ void Game::Initialize()
 
   if(!renderer)
   {
-    std::cerr << "Renderer failed to create" << std::endl;
+    Logger::Err("Renderer failed to create");
+    return;
   }
 
-  SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+  //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
   isRunning = true;
 }
 
-glm::vec2 playerPosition;
-glm::vec2 playerVelocity;
 
 void Game::Setup()
 {
-  playerPosition = { 10.0, 20.0 };
-  playerVelocity = { 1.0, 0.0 };
+  // TODO...
+  // Entity tank = Registry.CreateEntity()
+  // tank.AddComponent<TransformComponent>();
+  // tank.AddComponent<SpriteComponent>();
 }
 
 void Game::Destroy()
@@ -106,10 +110,13 @@ void Game::Update()
   {
     SDL_Delay(timeToWait);
   }
+
+  double deltaTime = (SDL_GetTicks() - previousMillisec) / 1000.0;
+
   previousMillisec = SDL_GetTicks();
 
-  playerPosition.x += playerVelocity.x;
-  playerPosition.y += playerVelocity.y;
+  // TODO:
+  // MovementSystem.Update();
 }
 
 void Game::Render()
@@ -117,18 +124,6 @@ void Game::Render()
   SDL_SetRenderDrawColor(renderer, 21, 21, 21, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
 
-  SDL_Surface* surface = IMG_Load("./assets/images/tank-tiger-right.png");
-  SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-  SDL_FreeSurface(surface);
-
-  SDL_Rect destRect = {
-    static_cast<int>(playerPosition.x),
-    static_cast<int>(playerPosition.y),
-    32,
-    32
-  };
-  SDL_RenderCopy(renderer, texture, NULL, &destRect);
-  SDL_DestroyTexture(texture);
 
   SDL_RenderPresent(renderer);
 }
