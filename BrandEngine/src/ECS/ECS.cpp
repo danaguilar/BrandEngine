@@ -1,6 +1,6 @@
 #include "ECS.h"
 
-int Entity::GetID()
+int Entity::GetID() const
 {
-  return id;
+  return ;
 }
