@@ -2,5 +2,5 @@
 
 int Entity::GetID() const
 {
-  return ;
+  return id;
 }
