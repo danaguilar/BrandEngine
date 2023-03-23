@@ -63,14 +63,14 @@ class Pool : public IPool
     std::vector<T> data;
   
   public:
-    Pool(int n = 100) { resize(n); };
+    Pool(int n = 100) { Resize(n); };
     ~Pool();
     void Add(T object) { data.push_back(object); }
-    void Clear() { data.clear()  }
+    void Clear() { data.clear(); }
     void Resize(int n) { data.resize(n); }
     void Set(int index, T object) { data[index] = object; }
     T& Get(int index) { return static_cast<T&>(data[index]); }
-    T& operator [](unsigned int index) { return date[index]; }
+    T& operator [](unsigned int index) { return data[index]; }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////
