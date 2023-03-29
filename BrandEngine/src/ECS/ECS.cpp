@@ -2,6 +2,8 @@
 #include "../Logger/Logger.h"
 #include <string>
 
+int IComponent::nextId = 0;
+
 int Entity::GetID() const
 {
   return id;
@@ -47,4 +49,19 @@ Entity Registry::CreateEntity()
 
   Logger::Log("Entity Created with id = " + std::to_string(entityID));
   return entity;
+}
+
+void Registry::AddEntityToSystems(Entity entity)
+{
+  const auto entityId = entity.GetID();
+
+  for (auto& system : systems) {
+    const auto entitySig = entityComponentSignatures[entityId];
+    const auto& systemSig = system.second -> GetComponentSignature();
+    
+    bool isInterested = (entitySig & systemSig) == systemSig;
+    if (isInterested) {
+      system.second -> AddEntity(entity);
+    }
+  }
 }
