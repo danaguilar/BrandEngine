@@ -1,4 +1,6 @@
 #include "ECS.h"
+#include "../Logger/Logger.h"
+#include <string>
 
 int Entity::GetID() const
 {
@@ -29,4 +31,20 @@ std::vector<Entity> System::GetEntities() const
 const Signature& System::GetComponentSignature() const
 {
   return componentSignature;
+}
+
+Entity Registry::CreateEntity()
+{
+  int entityID = numEntities++;
+  if (entityID > entityComponentSignatures.size())
+  {
+    entityComponentSignatures.resize(entityID+1);
+  }
+  
+  Entity entity(entityID);
+  
+  entitiesToBeAdded.insert(entity);
+
+  Logger::Log("Entity Created with id = " + std::to_string(entityID));
+  return entity;
 }

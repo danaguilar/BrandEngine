@@ -3,6 +3,7 @@
 
 #include <bitset>
 #include <vector>
+#include <set>
 #include <unordered_map>
 #include <typeindex>
 
@@ -33,6 +34,8 @@ class Entity
     Entity(int id): id(id) {};
     int GetID() const;
     bool operator ==(const Entity& other) const { return id == other.GetID(); };
+    bool operator >(const Entity& other) const { return id > other.GetID(); };
+    bool operator <(const Entity& other) const { return id < other.GetID(); };
 };
 
 class System
@@ -84,19 +87,74 @@ class Registry
     int numEntities = 0;
 
     // Stores components of the same type into pools. Each pool is ordered by the entity of that component
-    // componentPool[componentID]
-    // pool[entityID]
+    // [componentPool index = component id]
+    // [pool index = entity id]
     std::vector<IPool*> componentPools;
 
     // Signature of each entity
-    // [entityID]
+    // [vector indes = entity id]
     std::vector<Signature> entityComponentSignatures;
       
     std::unordered_map<std::type_index, System*> systems;
 
+    std::set<Entity> entitiesToBeAdded;
+    std::set<Entity> entitiesToBeRemoved;
     
-
+  public:
+    Registry() = default;
+    Entity CreateEntity();
+    template<typename T, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
+    template<typename T> void RemoveComponent(Entity entity);
+    template<typename T> bool HasComponent(Entity entity);
 };
+
+template<typename TComponent>
+bool Registry::HasComponent(Entity entity)
+{
+  const int componentId = Component<TComponent>.GetID();
+  const int entityId = entity.GetID();
+  return entityComponentSignatures[entityId].test(componentId);
+}
+
+template<typename TComponent>
+void Registry::RemoveComponent(Entity entity)
+{
+  const int componentId = Component<TComponent>.GetID();
+  const int entityId = entity.GetID();
+
+  entityComponentSignatures[entityId].reset(componentId);
+}
+
+template<typename TComponent, typename ...TArgs>
+void Registry::AddComponent(Entity entity, TArgs&& ...args)
+{
+  // Create component and add it in the appropriate pool (using component ID) and the appropriate space in that pool (using entity ID)
+  // Find and expand a space for a component pool
+  const int componentId = Component<TComponent>.GetID();
+  if (componentId >= componentPools.size())
+  {
+    componentPools.resize(componentId + 1, nullptr);
+  }
+  if (!componentPools[componentId])
+  {
+    componentPools[componentId] = new Pool<TComponent>;
+  }
+  Pool<TComponent>* componentPool = componentPools[componentId];
+
+  // Find and expand a space for an entity in a pool
+  const int entityId = entity.GetID();
+  if (entityId >= componentPool->size())
+  {
+    componentPool->Resize(numEntities);
+  }
+
+  // Create component
+  TComponent newComponent(std::forward<TArgs>(args)...);
+  // Add component with entity to the appropriate pool
+  componentPool[entityId] = newComponent;
+  // Add and change entity signature
+  entityComponentSignatures[entityId].set(componentId);
+}
 
 template<typename TComponent>
 void System::RegisterComponent()
