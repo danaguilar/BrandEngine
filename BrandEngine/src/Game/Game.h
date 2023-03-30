@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <SDL.h>
+#include "../ECS/ECS.h"
 
 class Game
 {
@@ -14,6 +15,8 @@ class Game
     SDL_Renderer* renderer;
     bool isRunning;
     int previousMillisec;
+
+    std::unique_ptr<Registry> registry;
 
 
   public:
