@@ -105,7 +105,9 @@ class Registry
     std::set<Entity> entitiesToBeRemoved;
     
   public:
-    Registry() { Logger::Log("Registry Constructor Called"); }
+    Registry() { 
+      Logger::Log("Registry Constructor Called");
+    }
 
     ~Registry() {
       Logger::Log("Registry Destructor Called");
