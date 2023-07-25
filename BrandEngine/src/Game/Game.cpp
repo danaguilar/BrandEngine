@@ -63,8 +63,13 @@ void Game::Initialize()
 void Game::Setup()
 {
   Entity tank = registry -> CreateEntity();
-  registry -> AddComponent<TransformComponent>(tank, glm::vec2(0,0), glm::vec2(0,0), 1);
-  registry -> AddComponent<RigidBodyComponent>(tank, glm::vec2(1,0));
+
+  // Adding components to entity
+  tank.AddComponent<TransformComponent>(glm::vec2(10.4,3.3), glm::vec2(1.0,1.0), 0.0);
+  tank.AddComponent<RigidBodyComponent>(glm::vec2(1.3,2.3));
+
+  // Removing component from entity
+  tank.RemoveComponent<TransformComponent>();
 }
 
 void Game::Destroy()

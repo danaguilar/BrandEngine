@@ -39,9 +39,18 @@ class Entity
     Entity(int id): id(id) {};
     int GetID() const;
     bool operator ==(const Entity& other) const { return id == other.GetID(); };
+    bool operator !=(const Entity& other) const { return id != other.GetID(); };
     bool operator >(const Entity& other) const { return id > other.GetID(); };
     bool operator <(const Entity& other) const { return id < other.GetID(); };
+
+    template<typename TComponent, typename ...TArgs> void AddComponent(TArgs&& ...args);
+    template<typename TComponent> void RemoveComponent();
+    template<typename TComponent> bool HasComponent();
+    template<typename TComponent> TComponent& GetComponent();
+
+    class Registry* registry;
 };
+
 
 class System
 {
@@ -88,6 +97,7 @@ class Pool : public IPool
 ////////////////////////////////////////////////////////////////////////////////////////
 // Manages the creation and destruction of enitites and adds systems and components
 ////////////////////////////////////////////////////////////////////////////////////////
+
 class Registry
 {
   private:
@@ -125,6 +135,8 @@ class Registry
     template<typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
     template<typename TComponent> void RemoveComponent(Entity entity);
     template<typename TComponent> bool HasComponent(Entity entity);
+    template<typename TComponent> TComponent& GetComponent(Entity entity);
+
 
     // Systems Management
     template<typename TSystem, typename ...TArgs> void AddSystem(TArgs&& ...args);
@@ -211,6 +223,18 @@ void Registry::RemoveComponent(Entity entity)
   const int entityId = entity.GetID();
 
   entityComponentSignatures[entityId].reset(componentId);
+
+  Logger::Log("Component " + std::to_string(componentId) + " was removed from entity " + std::to_string(entityId));
+}
+
+template<typename TComponent>
+TComponent& Registry::GetComponent(Entity entity)
+{
+  const int componentId = Component<TComponent>::GetID();
+  const int entityId = entity.GetID();
+
+  auto componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
+  return componentPool -> Get(entityId);
 }
 
 template<typename TComponent>
@@ -220,4 +244,29 @@ void System::RegisterComponent()
   componentSignature.set(componentId);
 }
 
+template<typename TComponent, typename ...TArgs>
+void Entity::AddComponent(TArgs && ...args)
+{
+  registry -> AddComponent<TComponent>(*this, std::forward<TArgs>(args)...);
+}
+
+template<typename TComponent>
+void Entity::RemoveComponent()
+{
+  registry -> RemoveComponent<TComponent>(*this);
+}
+
+template<typename TComponent>
+bool Entity::HasComponent()
+{
+  return registry -> HasComponent<TComponent>(*this);
+}
+
+template<typename TComponent>
+TComponent& Entity::GetComponent()
+{
+  return registry -> GetComponent<TComponent>(*this);
+}
+
 #endif
+
