@@ -240,7 +240,7 @@ TComponent& Registry::GetComponent(Entity entity)
 template<typename TComponent>
 void System::RegisterComponent()
 {
-  auto componentId = Component<TComponent>.GetID();
+  auto componentId = Component<TComponent>::GetID();
   componentSignature.set(componentId);
 }
 
