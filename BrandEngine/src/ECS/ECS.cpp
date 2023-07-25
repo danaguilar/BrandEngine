@@ -38,7 +38,7 @@ const Signature& System::GetComponentSignature() const
 Entity Registry::CreateEntity()
 {
   int entityID = numEntities++;
-  if (entityID > entityComponentSignatures.size())
+  if (entityID >= entityComponentSignatures.size())
   {
     entityComponentSignatures.resize(entityID+1);
   }

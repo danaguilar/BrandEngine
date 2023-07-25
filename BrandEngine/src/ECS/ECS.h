@@ -22,11 +22,12 @@ struct IComponent
 template <typename TComponent>
 class Component: public IComponent
 {
-  static int GetId()
-  {
-    static auto componentId = nextId++;
-    return componentId;
-  }
+  public:
+    static int GetID()
+    {
+      static auto id = nextId++;
+      return id;
+    }
 };
 
 class Entity
@@ -60,7 +61,8 @@ class System
 
 class IPool
 {
-  virtual ~IPool();
+  protected:
+    virtual ~IPool() {};
 };
 
 template<typename T>
@@ -71,13 +73,14 @@ class Pool : public IPool
   
   public:
     Pool(int n = 100) { Resize(n); };
-    ~Pool();
+    ~Pool() {};
     void Add(T object) { data.push_back(object); }
     void Clear() { data.clear(); }
+    int size() { return data.size(); }
     void Resize(int n) { data.resize(n); }
     void Set(int index, T object) { data[index] = object; }
     T& Get(int index) { return static_cast<T&>(data[index]); }
-    T& operator [](unsigned int index) { return data[index]; }
+    T& operator[](unsigned int index) { return data[index]; }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -186,9 +189,11 @@ void Registry::AddComponent(Entity entity, TArgs&& ...args)
   // Create component
   TComponent newComponent(std::forward<TArgs>(args)...);
   // Add component with entity to the appropriate pool
-  componentPool[entityId] = newComponent;
+  (*componentPool)[entityId] = newComponent;
   // Add and change entity signature
   entityComponentSignatures[entityId].set(componentId);
+
+  Logger::Log("Component " + std::to_string(componentId) + " was added to entity " + std::to_string(entityId));
 }
 
 template<typename TComponent>
