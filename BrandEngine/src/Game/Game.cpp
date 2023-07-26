@@ -3,7 +3,9 @@
 #include "../ECS/ECS.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
+#include "../Components/SpriteComponent.h"
 #include "../Systems/MovementSystem.h"
+#include "../Systems/RenderSystem.h"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <glm/glm.hpp>
@@ -65,12 +67,19 @@ void Game::Setup()
 {
 
   registry -> AddSystem<MovementSystem>();
+  registry -> AddSystem<RenderSystem>();
 
   Entity tank = registry -> CreateEntity();
+  Entity truck = registry -> CreateEntity();
 
   // Adding components to entity
-  tank.AddComponent<TransformComponent>(glm::vec2(10.4,3.3), glm::vec2(1.0,1.0), 0.0);
-  tank.AddComponent<RigidBodyComponent>(glm::vec2(1.3,2.3));
+  tank.AddComponent<TransformComponent>(glm::vec2(10,3), glm::vec2(1.0,1.0), 0.0);
+  tank.AddComponent<RigidBodyComponent>(glm::vec2(40,0));
+  tank.AddComponent<SpriteComponent>(10.0, 20.0);
+
+  truck.AddComponent<TransformComponent>(glm::vec2(10,3), glm::vec2(1.0,1.0), 0.0);
+  truck.AddComponent<RigidBodyComponent>(glm::vec2(5,50));
+  truck.AddComponent<SpriteComponent>(20.0, 10.0);
 }
 
 void Game::Destroy()
@@ -133,6 +142,7 @@ void Game::Render()
   SDL_SetRenderDrawColor(renderer, 21, 21, 21, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
 
+  registry->GetSystem<RenderSystem>().Render(renderer);
 
   SDL_RenderPresent(renderer);
 }
