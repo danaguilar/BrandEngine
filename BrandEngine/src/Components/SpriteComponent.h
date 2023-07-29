@@ -2,16 +2,22 @@
 #define SPRITECOMPONENT_H
 
 #include <glm/glm.hpp>
+#include <SDL.h>
+#include "../AssetManagement/AssetStore.h"
 
 struct SpriteComponent 
 {
-   float width;
-   float height;
+   int width;
+   int height;
+   SDL_Rect srcRect;
+   std::string assetName;
 
-   SpriteComponent(float width = 0.0, float height = 0.0)
+   SpriteComponent(const std::string& assetName = "", int width = 0, int height = 0, int srcRectX = 0, int srcRectY = 0)
    {
       this -> width = width;
       this -> height = height;
+      this -> assetName = assetName;
+      this -> srcRect = {srcRectX, srcRectY, width, height};
    }
 };
 

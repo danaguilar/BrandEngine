@@ -6,6 +6,7 @@
 #include "../Components/SpriteComponent.h"
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
+#include "../AssetManagement/AssetStore.h"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <glm/glm.hpp>
@@ -15,6 +16,7 @@ Game::Game()
 {
   isRunning = false;
   registry = std::make_unique<Registry>();
+  assetStore = std::make_unique<AssetStore>();
   Logger::Log("Game constructor called");
 }
 
@@ -69,17 +71,20 @@ void Game::Setup()
   registry -> AddSystem<MovementSystem>();
   registry -> AddSystem<RenderSystem>();
 
+  assetStore -> CreateTexture(renderer, "tank-right", "./assets/images/tank-panther-right.png");
+  assetStore -> CreateTexture(renderer, "truck-down", "./assets/images/truck-ford-down.png");
+
   Entity tank = registry -> CreateEntity();
   Entity truck = registry -> CreateEntity();
 
   // Adding components to entity
   tank.AddComponent<TransformComponent>(glm::vec2(10,3), glm::vec2(1.0,1.0), 0.0);
   tank.AddComponent<RigidBodyComponent>(glm::vec2(40,0));
-  tank.AddComponent<SpriteComponent>(10.0, 20.0);
+  tank.AddComponent<SpriteComponent>("tank-right", 32, 32);
 
   truck.AddComponent<TransformComponent>(glm::vec2(10,3), glm::vec2(1.0,1.0), 0.0);
   truck.AddComponent<RigidBodyComponent>(glm::vec2(5,50));
-  truck.AddComponent<SpriteComponent>(20.0, 10.0);
+  truck.AddComponent<SpriteComponent>("truck-down", 32, 32);
 }
 
 void Game::Destroy()
@@ -142,7 +147,7 @@ void Game::Render()
   SDL_SetRenderDrawColor(renderer, 21, 21, 21, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
 
-  registry->GetSystem<RenderSystem>().Render(renderer);
+  registry->GetSystem<RenderSystem>().Render(renderer, assetStore);
 
   SDL_RenderPresent(renderer);
 }

@@ -4,6 +4,7 @@
 #include "../ECS/ECS.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/SpriteComponent.h"
+#include "../AssetManagement/AssetStore.h"
 #include <SDL.h>
 
 class RenderSystem: public System
@@ -15,19 +16,25 @@ class RenderSystem: public System
       RegisterComponent<SpriteComponent>();
     }
 
-    void Render(SDL_Renderer* renderer)
+    void Render(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore)
     {
       for (auto entity : GetEntities())
       {
-        // Create SDL rect
-        SDL_Rect rect; 
-        rect.x = entity.GetComponent<TransformComponent>().position.x;
-        rect.y = entity.GetComponent<TransformComponent>().position.y;
-        rect.w = entity.GetComponent<SpriteComponent>().width;
-        rect.h = entity.GetComponent<SpriteComponent>().height;
+        auto sprite = entity.GetComponent<SpriteComponent>();
+        auto transform = entity.GetComponent<TransformComponent>();
 
-        SDL_SetRenderDrawColor(renderer, 255,255,255,255);
-        SDL_RenderFillRect(renderer, &rect);
+        auto texture = assetStore->GetTexture(sprite.assetName);
+
+        SDL_Rect srcRect = sprite.srcRect;
+        SDL_Rect destRect = {
+          static_cast<int>(transform.position.x),
+          static_cast<int>(transform.position.y),
+          static_cast<int>(sprite.width * transform.scale.x),
+          static_cast<int>(sprite.height * transform.scale.y)
+        };
+
+
+        SDL_RenderCopyEx(renderer, texture, &srcRect, &destRect, transform.rotation, NULL, SDL_FLIP_NONE);
       }
     }
 

@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 #include "../ECS/ECS.h"
+#include "../AssetManagement/AssetStore.h"
 
 class Game
 {
@@ -17,6 +18,7 @@ class Game
     int previousMillisec;
 
     std::unique_ptr<Registry> registry;
+    std::unique_ptr<AssetStore> assetStore;
 
 
   public:
