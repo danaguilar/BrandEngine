@@ -25,7 +25,7 @@ void Tilemap::CreateMap(std::unique_ptr<Registry>& registry, const std::string& 
        // Create a new tile entity
        Entity tile = registry -> CreateEntity();
        // Create a Sprite based off the tilemap, rendering only a tile_size square at on the given row and column based on the found tiledata
-       tile.AddComponent<SpriteComponent>(asset_name, tile_size, tile_size, (tiledata%10) * tile_size, (tiledata/10) * tile_size);
+       tile.AddComponent<SpriteComponent>(asset_name, tile_size, tile_size, 0, (tiledata%10) * tile_size, (tiledata/10) * tile_size);
        // Set the location of the entity based on where the tiledate was located in the file
        tile.AddComponent<TransformComponent>(glm::vec2(col*tile_size, row*tile_size), glm::vec2(1.0,1.0), 0.0);
        col++;
@@ -36,4 +36,5 @@ void Tilemap::CreateMap(std::unique_ptr<Registry>& registry, const std::string& 
   else {
     Logger::Err("Cannot Load map data");
   }
+  tilemap.close();
 }

@@ -73,24 +73,23 @@ void Game::LoadLevel(int level) {
 
   assetStore -> CreateTexture(renderer, "tank-right", "./assets/images/tank-panther-right.png");
   assetStore -> CreateTexture(renderer, "truck-down", "./assets/images/truck-ford-down.png");
-  assetStore -> CreateTexture(renderer, "tilemap", "./assets/tilemaps/jungle.png");
+  assetStore -> CreateTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 
   // Maybe make into a tilemap object
-  Tilemap map = Tilemap("tilemap", 32);
+  Tilemap map = Tilemap("tilemap-image", 32);
   map.CreateMap(registry, "./assets/tilemaps/jungle.map");
-
 
   // Adding components to entity
   Entity tank = registry -> CreateEntity();
   tank.AddComponent<TransformComponent>(glm::vec2(10,3), glm::vec2(1.0,1.0), 0.0);
   tank.AddComponent<RigidBodyComponent>(glm::vec2(40,0));
-  tank.AddComponent<SpriteComponent>("tank-right", 32, 32);
+  tank.AddComponent<SpriteComponent>("tank-right", 32, 32, 2);
 
 
   Entity truck = registry -> CreateEntity();
   truck.AddComponent<TransformComponent>(glm::vec2(10,3), glm::vec2(1.0,1.0), 0.0);
   truck.AddComponent<RigidBodyComponent>(glm::vec2(5,50));
-  truck.AddComponent<SpriteComponent>("truck-down", 32, 32);
+  truck.AddComponent<SpriteComponent>("truck-down", 32, 32, 1);
 }
 
 void Game::Setup()

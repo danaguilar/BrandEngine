@@ -6,20 +6,27 @@
 #include "../Components/SpriteComponent.h"
 #include "../AssetManagement/AssetStore.h"
 #include <SDL.h>
+#include <algorithm>
 
-class RenderSystem: public System
-{
+class RenderSystem: public System {
   public:
-    RenderSystem()
-    {
+    RenderSystem() {
       RegisterComponent<TransformComponent>();
       RegisterComponent<SpriteComponent>();
     }
 
-    void Render(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore)
-    {
-      for (auto entity : GetEntities())
-      {
+    void Render(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore) {
+      // Sort entities by zIndex. It's perhaps a better idea to keep entities ordered by zIndex when they are created/destroyed, but this will work
+      // decently well for now
+      auto entities = GetEntities();
+      std::sort(
+        entities.begin(), entities.end(),
+        [](auto entA, auto entB) {
+          return entA.GetComponent<SpriteComponent>().zIndex < entB.GetComponent<SpriteComponent>().zIndex;
+        }
+      );
+
+      for (auto entity : entities) {
         auto sprite = entity.GetComponent<SpriteComponent>();
         auto transform = entity.GetComponent<TransformComponent>();
 
@@ -43,7 +50,6 @@ class RenderSystem: public System
         );
       }
     }
-
 };
 
 

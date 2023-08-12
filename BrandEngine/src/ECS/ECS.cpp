@@ -1,21 +1,19 @@
 #include "ECS.h"
 #include "../Logger/Logger.h"
 #include <string>
+#include <algorithm>
 
 int IComponent::nextId = 0;
 
-int Entity::GetID() const
-{
+int Entity::GetID() const {
   return id;
 }
 
-void System::AddEntity(Entity entity)
-{
+void System::AddEntity(Entity entity) {
   entities.push_back(entity);
 }
 
-void System::RemoveEntity(Entity entity)
-{
+void System::RemoveEntity(Entity entity) {
   entities.erase(
     std::remove_if(
       entities.begin(), entities.end(),
@@ -25,18 +23,15 @@ void System::RemoveEntity(Entity entity)
   );
 }
 
-std::vector<Entity> System::GetEntities() const
-{
+std::vector<Entity> System::GetEntities() const {
   return entities;
 }
 
-const Signature& System::GetComponentSignature() const
-{
+const Signature& System::GetComponentSignature() const {
   return componentSignature;
 }
 
-Entity Registry::CreateEntity()
-{
+Entity Registry::CreateEntity() {
   int entityID = numEntities++;
   if (entityID >= entityComponentSignatures.size())
   {
