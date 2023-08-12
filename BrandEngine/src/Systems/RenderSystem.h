@@ -23,8 +23,6 @@ class RenderSystem: public System
         auto sprite = entity.GetComponent<SpriteComponent>();
         auto transform = entity.GetComponent<TransformComponent>();
 
-        auto texture = assetStore->GetTexture(sprite.assetName);
-
         SDL_Rect srcRect = sprite.srcRect;
         SDL_Rect destRect = {
           static_cast<int>(transform.position.x),
@@ -34,7 +32,15 @@ class RenderSystem: public System
         };
 
 
-        SDL_RenderCopyEx(renderer, texture, &srcRect, &destRect, transform.rotation, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(
+          renderer,
+          assetStore->GetTexture(sprite.assetName),
+          &srcRect,
+          &destRect,
+          transform.rotation,
+          NULL,
+          SDL_FLIP_NONE
+        );
       }
     }
 

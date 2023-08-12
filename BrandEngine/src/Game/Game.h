@@ -26,6 +26,7 @@ class Game
     ~Game();
     void Initialize();
     void Setup();
+    void LoadLevel(int level);
     void Run();
     void Destroy();
     void ProcessInput();

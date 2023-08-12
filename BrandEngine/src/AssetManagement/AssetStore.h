@@ -1,5 +1,4 @@
-#ifndef ASSETSTORE_H
-#define ASSETSTORE_H
+#pragma once
 
 #include <SDL.h>
 #include <map>
@@ -20,6 +19,3 @@ class AssetStore
     void RemoveTexture(std::string& textureName);
     void CreateTexture(SDL_Renderer* renderer, const std::string& textureName, const std::string& fileLocation);
 };
-
-#endif // ASSETSTORE_H
-

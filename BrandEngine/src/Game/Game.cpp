@@ -7,10 +7,13 @@
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
 #include "../AssetManagement/AssetStore.h"
+#include "../Tilemap/Tilemap.h"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <glm/glm.hpp>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 Game::Game()
 {
@@ -64,27 +67,35 @@ void Game::Initialize()
   isRunning = true;
 }
 
-
-void Game::Setup()
-{
-
+void Game::LoadLevel(int level) {
   registry -> AddSystem<MovementSystem>();
   registry -> AddSystem<RenderSystem>();
 
   assetStore -> CreateTexture(renderer, "tank-right", "./assets/images/tank-panther-right.png");
   assetStore -> CreateTexture(renderer, "truck-down", "./assets/images/truck-ford-down.png");
+  assetStore -> CreateTexture(renderer, "tilemap", "./assets/tilemaps/jungle.png");
 
-  Entity tank = registry -> CreateEntity();
-  Entity truck = registry -> CreateEntity();
+  // Maybe make into a tilemap object
+  Tilemap map = Tilemap("tilemap", 32);
+  map.CreateMap(registry, "./assets/tilemaps/jungle.map");
+
 
   // Adding components to entity
+  Entity tank = registry -> CreateEntity();
   tank.AddComponent<TransformComponent>(glm::vec2(10,3), glm::vec2(1.0,1.0), 0.0);
   tank.AddComponent<RigidBodyComponent>(glm::vec2(40,0));
   tank.AddComponent<SpriteComponent>("tank-right", 32, 32);
 
+
+  Entity truck = registry -> CreateEntity();
   truck.AddComponent<TransformComponent>(glm::vec2(10,3), glm::vec2(1.0,1.0), 0.0);
   truck.AddComponent<RigidBodyComponent>(glm::vec2(5,50));
   truck.AddComponent<SpriteComponent>("truck-down", 32, 32);
+}
+
+void Game::Setup()
+{
+  Game::LoadLevel(1);
 }
 
 void Game::Destroy()
