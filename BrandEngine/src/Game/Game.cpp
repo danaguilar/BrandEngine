@@ -4,8 +4,10 @@
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
+#include "../Components/AnimationComponent.h"
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
+#include "../Systems/AnimationSystem.h"
 #include "../AssetManagement/AssetStore.h"
 #include "../Tilemap/Tilemap.h"
 #include <SDL.h>
@@ -70,9 +72,11 @@ void Game::Initialize()
 void Game::LoadLevel(int level) {
   registry -> AddSystem<MovementSystem>();
   registry -> AddSystem<RenderSystem>();
+  registry -> AddSystem<AnimationSystem>();
 
   assetStore -> CreateTexture(renderer, "tank-right", "./assets/images/tank-panther-right.png");
   assetStore -> CreateTexture(renderer, "truck-down", "./assets/images/truck-ford-down.png");
+  assetStore -> CreateTexture(renderer, "chopper-frames-image", "./assets/images/chopper.png");
   assetStore -> CreateTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 
   // Maybe make into a tilemap object
@@ -88,8 +92,14 @@ void Game::LoadLevel(int level) {
 
   Entity truck = registry -> CreateEntity();
   truck.AddComponent<TransformComponent>(glm::vec2(10,3), glm::vec2(1.0,1.0), 0.0);
-  truck.AddComponent<RigidBodyComponent>(glm::vec2(5,50));
-  truck.AddComponent<SpriteComponent>("truck-down", 32, 32, 1);
+  truck.AddComponent<RigidBodyComponent>(glm::vec2(60,0));
+  truck.AddComponent<SpriteComponent>("truck-down", 32, 32, 2);
+
+  Entity chopper = registry -> CreateEntity();
+  truck.AddComponent<TransformComponent>(glm::vec2(0,0), glm::vec2(1.0,1.0), 0.0);
+  truck.AddComponent<RigidBodyComponent>(glm::vec2(100,10));
+  truck.AddComponent<SpriteComponent>("chopper-frames-image", 32, 32, 2);
+  truck.AddComponent<AnimationComponent>(2, 0, 10, true);
 }
 
 void Game::Setup()
@@ -148,6 +158,7 @@ void Game::Update()
   previousMillisec = SDL_GetTicks();
 
   registry->GetSystem<MovementSystem>().Update(deltaTime);
+  registry->GetSystem<AnimationSystem>().Update(deltaTime);
 
   registry->Update();
 }

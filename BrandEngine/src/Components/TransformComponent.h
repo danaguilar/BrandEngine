@@ -1,10 +1,8 @@
-#ifndef TRANSFORMCOMPONENT_H
-#define TRANSFORMCOMPONENT_H
+#pragma once 
 
 #include <glm/glm.hpp>
 
-struct TransformComponent
-{
+struct TransformComponent {
   glm::vec2 position;
   glm::vec2 scale;
   double rotation;
@@ -16,4 +14,3 @@ struct TransformComponent
   }
 };
 
-#endif
