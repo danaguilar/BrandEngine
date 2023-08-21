@@ -5,8 +5,7 @@
 #include "../Components/SpriteComponent.h"
 #include "../Logger/Logger.h"
 
-class AnimationSystem: public System
-{
+class AnimationSystem: public System {
   public: 
     AnimationSystem() {
       RegisterComponent<AnimationComponent>();
@@ -19,7 +18,6 @@ class AnimationSystem: public System
         auto& spriteComponent = entity.GetComponent<SpriteComponent>();
 
         animationComponent.timeSinceFrameChange = animationComponent.timeSinceFrameChange + (deltaTime);
-        Logger::Log(std::to_string(animationComponent.timeSinceFrameChange));
         if (animationComponent.timeSinceFrameChange > (1 / animationComponent.framesPerSecond)) {
           animationComponent.currentFrame++;
           if (animationComponent.currentFrame >= animationComponent.numberOfFrames) {

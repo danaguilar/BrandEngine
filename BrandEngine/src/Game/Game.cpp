@@ -5,9 +5,11 @@
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/AnimationComponent.h"
+#include "../Components/BoxColliderComponent.h"
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
 #include "../Systems/AnimationSystem.h"
+#include "../Systems/CollisionSystem.h"
 #include "../AssetManagement/AssetStore.h"
 #include "../Tilemap/Tilemap.h"
 #include <SDL.h>
@@ -73,9 +75,10 @@ void Game::LoadLevel(int level) {
   registry -> AddSystem<MovementSystem>();
   registry -> AddSystem<RenderSystem>();
   registry -> AddSystem<AnimationSystem>();
+  registry -> AddSystem<CollisionSystem>();
 
   assetStore -> CreateTexture(renderer, "tank-right", "./assets/images/tank-panther-right.png");
-  assetStore -> CreateTexture(renderer, "truck-down", "./assets/images/truck-ford-down.png");
+  assetStore -> CreateTexture(renderer, "truck-left", "./assets/images/truck-ford-left.png");
   assetStore -> CreateTexture(renderer, "chopper-frames-image", "./assets/images/chopper.png");
   assetStore -> CreateTexture(renderer, "tilemap-image", "./assets/tilemaps/jungle.png");
 
@@ -88,18 +91,20 @@ void Game::LoadLevel(int level) {
   tank.AddComponent<TransformComponent>(glm::vec2(10,3), glm::vec2(1.0,1.0), 0.0);
   tank.AddComponent<RigidBodyComponent>(glm::vec2(40,0));
   tank.AddComponent<SpriteComponent>("tank-right", 32, 32, 2);
+  tank.AddComponent<BoxColliderComponent>(32,32);
 
 
   Entity truck = registry -> CreateEntity();
-  truck.AddComponent<TransformComponent>(glm::vec2(10,3), glm::vec2(1.0,1.0), 0.0);
-  truck.AddComponent<RigidBodyComponent>(glm::vec2(60,0));
-  truck.AddComponent<SpriteComponent>("truck-down", 32, 32, 2);
+  truck.AddComponent<TransformComponent>(glm::vec2(200,3), glm::vec2(1.0,1.0), 0.0);
+  truck.AddComponent<RigidBodyComponent>(glm::vec2(-60,0));
+  truck.AddComponent<SpriteComponent>("truck-left", 32, 32, 2);
+  truck.AddComponent<BoxColliderComponent>(32,32);
 
   Entity chopper = registry -> CreateEntity();
-  truck.AddComponent<TransformComponent>(glm::vec2(0,0), glm::vec2(1.0,1.0), 0.0);
-  truck.AddComponent<RigidBodyComponent>(glm::vec2(100,10));
-  truck.AddComponent<SpriteComponent>("chopper-frames-image", 32, 32, 2);
-  truck.AddComponent<AnimationComponent>(2, 0, 10, true);
+  chopper.AddComponent<TransformComponent>(glm::vec2(0,0), glm::vec2(1.0,1.0), 0.0);
+  chopper.AddComponent<RigidBodyComponent>(glm::vec2(100,10));
+  chopper.AddComponent<SpriteComponent>("chopper-frames-image", 32, 32, 2);
+  chopper.AddComponent<AnimationComponent>(2, 0, 10, true);
 }
 
 void Game::Setup()
@@ -159,6 +164,7 @@ void Game::Update()
 
   registry->GetSystem<MovementSystem>().Update(deltaTime);
   registry->GetSystem<AnimationSystem>().Update(deltaTime);
+  registry->GetSystem<CollisionSystem>().Update(deltaTime);
 
   registry->Update();
 }
