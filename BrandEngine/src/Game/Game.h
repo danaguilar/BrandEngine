@@ -15,6 +15,7 @@ class Game
     SDL_Window* window;
     SDL_Renderer* renderer;
     bool isRunning;
+    bool isDebug;
     int previousMillisec;
 
     std::unique_ptr<Registry> registry;

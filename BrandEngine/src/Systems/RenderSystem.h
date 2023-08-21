@@ -15,6 +15,7 @@ class RenderSystem: public System {
       RegisterComponent<SpriteComponent>();
     }
 
+
     void Render(SDL_Renderer* renderer, std::unique_ptr<AssetStore>& assetStore) {
       // Sort entities by zIndex. It's perhaps a better idea to keep entities ordered by zIndex when they are created/destroyed, but this will work
       // decently well for now

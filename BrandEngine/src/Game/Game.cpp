@@ -10,6 +10,7 @@
 #include "../Systems/RenderSystem.h"
 #include "../Systems/AnimationSystem.h"
 #include "../Systems/CollisionSystem.h"
+#include "../Systems/RenderDebugSystem.h"
 #include "../AssetManagement/AssetStore.h"
 #include "../Tilemap/Tilemap.h"
 #include <SDL.h>
@@ -22,6 +23,7 @@
 Game::Game()
 {
   isRunning = false;
+  isDebug = false;
   registry = std::make_unique<Registry>();
   assetStore = std::make_unique<AssetStore>();
   Logger::Log("Game constructor called");
@@ -76,6 +78,7 @@ void Game::LoadLevel(int level) {
   registry -> AddSystem<RenderSystem>();
   registry -> AddSystem<AnimationSystem>();
   registry -> AddSystem<CollisionSystem>();
+  registry -> AddSystem<RenderDebugSystem>();
 
   assetStore -> CreateTexture(renderer, "tank-right", "./assets/images/tank-panther-right.png");
   assetStore -> CreateTexture(renderer, "truck-left", "./assets/images/truck-ford-left.png");
@@ -133,17 +136,17 @@ void Game::Run()
 void Game::ProcessInput()
 {
   SDL_Event sdlEvent;
-  while(SDL_PollEvent(&sdlEvent)) // Poll event every frame
-  {
-    switch (sdlEvent.type)
-    {
+  while(SDL_PollEvent(&sdlEvent)) { // Poll event every frame
+    switch (sdlEvent.type) {
       case SDL_QUIT:          // Stop running game if window is closed
         isRunning = false;
         break;
       case SDL_KEYDOWN:
-        if (sdlEvent.key.keysym.sym == SDLK_ESCAPE)  // Stop running game if esc key is pressed
-        {
+        if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) { // Stop running game if esc key is pressed
           isRunning = false;
+        }
+        if (sdlEvent.key.keysym.sym = SDLK_d) {
+          isDebug = !isDebug;
         }
     }
   }
@@ -175,6 +178,9 @@ void Game::Render()
   SDL_RenderClear(renderer);
 
   registry->GetSystem<RenderSystem>().Render(renderer, assetStore);
+  if (isDebug) {
+    registry->GetSystem<RenderDebugSystem>().Render(renderer);
+  }
 
   SDL_RenderPresent(renderer);
 }
