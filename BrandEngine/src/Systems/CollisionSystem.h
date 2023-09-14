@@ -45,6 +45,9 @@ class CollisionSystem : public System {
           if (collisionDetected) {
             aCollider.isColliding = true;
             bCollider.isColliding = true;
+
+            a.Kill();
+            b.Kill();
           }
         }
       }

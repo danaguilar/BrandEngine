@@ -3,6 +3,7 @@
 
 #include <bitset>
 #include <vector>
+#include <deque>
 #include <set>
 #include <memory>
 #include <unordered_map>
@@ -13,15 +14,13 @@
 unsigned int const MAX_COMPONENTS = 32;
 typedef std::bitset<MAX_COMPONENTS> Signature;
 
-struct IComponent
-{
+struct IComponent {
   protected:
     static int nextId;
 };
 
 template <typename TComponent>
-class Component: public IComponent
-{
+class Component: public IComponent {
   public:
     static int GetID()
     {
@@ -30,14 +29,16 @@ class Component: public IComponent
     }
 };
 
-class Entity
-{
+class Entity {
   private:
     int id;
 
   public:
+    class Registry* registry;
+
     Entity(int id): id(id) {};
     int GetID() const;
+    void Kill();
     bool operator ==(const Entity& other) const { return id == other.GetID(); };
     bool operator !=(const Entity& other) const { return id != other.GetID(); };
     bool operator >(const Entity& other) const { return id > other.GetID(); };
@@ -48,12 +49,10 @@ class Entity
     template<typename TComponent> bool HasComponent();
     template<typename TComponent> TComponent& GetComponent();
 
-    class Registry* registry;
 };
 
 
-class System
-{
+class System {
   private:
     Signature componentSignature;
     std::vector<Entity> entities;
@@ -68,15 +67,13 @@ class System
     template<typename TComponent> void RegisterComponent();
 };
 
-class IPool
-{
+class IPool {
   protected:
     virtual ~IPool() {};
 };
 
 template<typename T>
-class Pool : public IPool
-{
+class Pool : public IPool {
   private:
     std::vector<T> data;
   
@@ -98,10 +95,11 @@ class Pool : public IPool
 // Manages the creation and destruction of enitites and adds systems and components
 ////////////////////////////////////////////////////////////////////////////////////////
 
-class Registry
-{
+class Registry {
   private:
     int numEntities = 0;
+
+    std::deque<int> freeEntityIds;
 
     // Stores components of the same type into pools. Each pool is ordered by the entity of that component
     // [componentPool index = component id]
@@ -130,6 +128,7 @@ class Registry
     
     // Entity Management
     Entity CreateEntity();
+    void DeleteEntity(Entity entity);
 
     // Component Management
     template<typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
@@ -146,6 +145,7 @@ class Registry
 
     // Adding entities to all systems
     void AddEntityToSystems(Entity entity);
+    void RemoveEntityFromSystems(Entity entity);
 };
 
 template<typename TSystem, typename ...TArgs>
