@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../ECS/ECS.h"
+#include "../EventBus/EventBus.h"
+#include "../Events/CollisionEvent.h"
 #include "../Components/BoxColliderComponent.h"
 #include "../Components/TransformComponent.h"
 #include "../Logger/Logger.h"
@@ -13,7 +15,7 @@ class CollisionSystem : public System {
       RegisterComponent<TransformComponent>();
     }
 
-    void Update(double deltaTime) {
+    void Update(std::unique_ptr<EventBus>& eventBus) {
       auto entities = GetEntities();
 
       for (auto entity : entities) {
@@ -43,11 +45,7 @@ class CollisionSystem : public System {
           );
 
           if (collisionDetected) {
-            aCollider.isColliding = true;
-            bCollider.isColliding = true;
-
-            a.Kill();
-            b.Kill();
+            eventBus->EmitEvent<CollisionEvent>(a,b);
           }
         }
       }
