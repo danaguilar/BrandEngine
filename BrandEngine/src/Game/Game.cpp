@@ -12,6 +12,7 @@
 #include "../Systems/CollisionSystem.h"
 #include "../Systems/RenderDebugSystem.h"
 #include "../Systems/DamageSystem.h"
+#include "../Systems/KeyboardMovementSystem.h"
 #include "../AssetManagement/AssetStore.h"
 #include "../Tilemap/Tilemap.h"
 #include <SDL.h>
@@ -82,6 +83,7 @@ void Game::LoadLevel(int level) {
   registry -> AddSystem<CollisionSystem>();
   registry -> AddSystem<RenderDebugSystem>();
   registry -> AddSystem<DamageSystem>();
+  registry -> AddSystem<KeyboardMovementSystem>();
 
   assetStore -> CreateTexture(renderer, "tank-right", "./assets/images/tank-panther-right.png");
   assetStore -> CreateTexture(renderer, "truck-left", "./assets/images/truck-ford-left.png");
@@ -148,9 +150,10 @@ void Game::ProcessInput()
         if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) { // Stop running game if esc key is pressed
           isRunning = false;
         }
-        if (sdlEvent.key.keysym.sym = SDLK_d) {
+        if (sdlEvent.key.keysym.sym == SDLK_d) {
           isDebug = !isDebug;
         }
+        eventBus->EmitEvent<KeyPressedEvent>('A');
     }
   }
 }
@@ -173,6 +176,7 @@ void Game::Update()
 
   // Perform the subscription of events for all systems
   registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
+  registry->GetSystem<KeyboardMovementSystem>().SubscribeToEvents(eventBus);
 
   registry->GetSystem<MovementSystem>().Update(deltaTime);
   registry->GetSystem<AnimationSystem>().Update(deltaTime);

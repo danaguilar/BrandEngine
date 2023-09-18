@@ -46,9 +46,7 @@ Entity Registry::CreateEntity() {
     if (entityID >= entityComponentSignatures.size()) {
       entityComponentSignatures.resize(entityID+1);
     }
-  }
-
-  else {
+  } else {
     entityID = freeEntityIds.front();
     freeEntityIds.pop_front();
   }

@@ -79,9 +79,7 @@ class EventBus {
           auto callback = it->get();
           TEvent event(std::forward<TArgs>(args)...);
           callback->Execute(event);
-
         }
       }
     }
-    
 };
